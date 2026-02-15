@@ -35,8 +35,8 @@ let clock;
 function init() {
   const canvas = document.getElementById("game-canvas");
   scene = new THREE.Scene();
-  scene.background = new THREE.Color(0x0a0a12);
-  scene.fog = new THREE.Fog(0x0a0a12, 20, 55);
+  scene.background = new THREE.Color(0xffffff);
+  scene.fog = new THREE.Fog(0xffffff, 20, 55);
 
   camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
   camera.position.set(0, 2, 0);
@@ -83,7 +83,7 @@ function buildArena() {
   const half = CONFIG.arenaSize / 2;
   const floorGeo = new THREE.PlaneGeometry(CONFIG.arenaSize, CONFIG.arenaSize);
   const floorMat = new THREE.MeshStandardMaterial({
-    color: 0x0d0d18,
+    color: 0xffffff,
     metalness: 0.2,
     roughness: 0.9,
   });
@@ -93,9 +93,9 @@ function buildArena() {
   scene.add(floor);
 
   // Grid lines on floor
-  const gridHelper = new THREE.GridHelper(CONFIG.arenaSize, 20, 0x00ffaa, 0x113322);
+  const gridHelper = new THREE.GridHelper(CONFIG.arenaSize, 20, 0xcccccc, 0xdddddd);
   gridHelper.position.y = 0.01;
-  gridHelper.material.opacity = 0.15;
+  gridHelper.material.opacity = 0.4;
   gridHelper.material.transparent = true;
   scene.add(gridHelper);
 
@@ -133,16 +133,75 @@ function buildArena() {
 
 function createEnemy(x, z) {
   const group = new THREE.Group();
-  const bodyGeo = new THREE.CapsuleGeometry(0.4, 1, 4, 8);
-  const bodyMat = new THREE.MeshStandardMaterial({
-    color: 0xff4466,
-    emissive: 0xff2244,
-    emissiveIntensity: 0.3,
+
+  // Zombie colors: light yellow skin, lighter clothes, light green eyes
+  const skinMat = new THREE.MeshStandardMaterial({
+    color: 0xfff5a0,
+    emissive: 0x333300,
+    emissiveIntensity: 0.15,
+    roughness: 0.85,
+    metalness: 0.05,
   });
-  const body = new THREE.Mesh(bodyGeo, bodyMat);
-  body.position.y = 1;
-  body.castShadow = true;
-  group.add(body);
+  const clothesMat = new THREE.MeshStandardMaterial({
+    color: 0x554d45,
+    roughness: 0.85,
+    metalness: 0,
+  });
+  const eyeMat = new THREE.MeshStandardMaterial({
+    color: 0x88dd88,
+    emissive: 0x55cc55,
+    emissiveIntensity: 0.35,
+  });
+
+  // Head (slightly lumpy zombie head)
+  const headGeo = new THREE.SphereGeometry(0.28, 8, 6);
+  const head = new THREE.Mesh(headGeo, skinMat);
+  head.position.y = 1.55;
+  head.castShadow = true;
+  group.add(head);
+
+  // Eyes (two small red spheres)
+  const eyeGeo = new THREE.SphereGeometry(0.06, 6, 4);
+  const eyeL = new THREE.Mesh(eyeGeo, eyeMat);
+  eyeL.position.set(-0.1, 1.58, 0.22);
+  group.add(eyeL);
+  const eyeR = new THREE.Mesh(eyeGeo, eyeMat);
+  eyeR.position.set(0.1, 1.58, 0.22);
+  group.add(eyeR);
+
+  // Torso (hunched, tattered)
+  const torsoGeo = new THREE.BoxGeometry(0.35, 0.5, 0.2);
+  const torso = new THREE.Mesh(torsoGeo, clothesMat);
+  torso.position.y = 1.1;
+  torso.rotation.x = 0.15;
+  torso.castShadow = true;
+  group.add(torso);
+
+  // Arms (outstretched zombie arms)
+  const armGeo = new THREE.CapsuleGeometry(0.06, 0.4, 4, 4);
+  const armL = new THREE.Mesh(armGeo, skinMat);
+  armL.position.set(-0.28, 1.15, 0.35);
+  armL.rotation.x = 0.4;
+  armL.rotation.z = 0.3;
+  armL.castShadow = true;
+  group.add(armL);
+  const armR = new THREE.Mesh(armGeo, skinMat);
+  armR.position.set(0.28, 1.15, 0.35);
+  armR.rotation.x = 0.4;
+  armR.rotation.z = -0.3;
+  armR.castShadow = true;
+  group.add(armR);
+
+  // Legs (shambling)
+  const legGeo = new THREE.BoxGeometry(0.12, 0.5, 0.12);
+  const legL = new THREE.Mesh(legGeo, clothesMat);
+  legL.position.set(-0.1, 0.55, 0);
+  legL.castShadow = true;
+  group.add(legL);
+  const legR = new THREE.Mesh(legGeo, clothesMat);
+  legR.position.set(0.1, 0.55, 0);
+  legR.castShadow = true;
+  group.add(legR);
 
   group.position.set(x, 0, z);
   group.userData = { health: CONFIG.enemyHealth };
@@ -170,6 +229,7 @@ function hitEnemy(enemy, damage) {
 
 function updateEnemies(delta) {
   const playerPos = camera.position;
+  const time = clock.getElapsedTime() * 1000;
   for (const enemy of enemies) {
     const dx = playerPos.x - enemy.position.x;
     const dz = playerPos.z - enemy.position.z;
@@ -178,6 +238,10 @@ function updateEnemies(delta) {
       enemy.position.x += (dx / dist) * CONFIG.enemySpeed;
       enemy.position.z += (dz / dist) * CONFIG.enemySpeed;
       enemy.lookAt(playerPos.x, enemy.position.y, playerPos.z);
+      // Zombie shuffle: slight arm sway (children: 0=head,1=eyeL,2=eyeR,3=torso,4=armL,5=armR,6=legL,7=legR)
+      const sway = Math.sin(time * 0.003 + enemy.position.x) * 0.12;
+      if (enemy.children[4]) enemy.children[4].rotation.x = 0.4 + sway;
+      if (enemy.children[5]) enemy.children[5].rotation.x = 0.4 - sway;
       if (dist < 4 && Math.random() < 0.02) {
         playerHealth = Math.max(0, playerHealth - CONFIG.enemyDamage);
         updateHUD();

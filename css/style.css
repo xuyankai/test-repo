@@ -1,0 +1,140 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  overflow: hidden;
+  background: #0a0a0f;
+  font-family: "JetBrains Mono", "Fira Code", monospace;
+}
+
+#game-container {
+  position: fixed;
+  inset: 0;
+  width: 100vw;
+  height: 100vh;
+}
+
+#game-canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+  cursor: none;
+}
+
+#hud {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+}
+
+#hud * {
+  pointer-events: auto;
+}
+
+#crosshair {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  width: 20px;
+  height: 20px;
+  border: 2px solid rgba(0, 255, 170, 0.9);
+  border-radius: 50%;
+  background: transparent;
+  box-shadow: 0 0 12px rgba(0, 255, 170, 0.4);
+}
+
+#crosshair::before {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  width: 4px;
+  height: 4px;
+  background: rgba(0, 255, 170, 0.95);
+  border-radius: 50%;
+}
+
+#top-bar {
+  position: absolute;
+  top: 16px;
+  left: 0;
+  right: 0;
+  display: flex;
+  justify-content: space-between;
+  padding: 0 24px;
+  font-size: 18px;
+  font-weight: 600;
+  color: #00ffaa;
+  text-shadow: 0 0 10px rgba(0, 255, 170, 0.5);
+}
+
+#health {
+  color: #ff4466;
+  text-shadow: 0 0 10px rgba(255, 68, 102, 0.5);
+}
+
+#start-screen,
+#game-over {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: rgba(10, 10, 15, 0.85);
+  pointer-events: auto;
+}
+
+#game-over {
+  background: rgba(10, 10, 15, 0.92);
+}
+
+#start-screen h1,
+#game-over h2 {
+  font-size: 3rem;
+  letter-spacing: 0.3em;
+  color: #00ffaa;
+  text-shadow: 0 0 30px rgba(0, 255, 170, 0.6);
+  margin-bottom: 16px;
+}
+
+#game-over h2 {
+  color: #ff4466;
+  text-shadow: 0 0 30px rgba(255, 68, 102, 0.6);
+}
+
+#start-screen p,
+#game-over p {
+  color: rgba(255, 255, 255, 0.7);
+  margin-bottom: 32px;
+  font-size: 14px;
+}
+
+button {
+  padding: 14px 40px;
+  font-size: 16px;
+  font-family: inherit;
+  font-weight: 600;
+  letter-spacing: 0.15em;
+  color: #0a0a0f;
+  background: #00ffaa;
+  border: none;
+  cursor: pointer;
+  box-shadow: 0 0 20px rgba(0, 255, 170, 0.5);
+  transition: all 0.2s;
+}
+
+button:hover {
+  background: #00dd99;
+  box-shadow: 0 0 30px rgba(0, 255, 170, 0.8);
+  transform: scale(1.05);
+}
+
+.hidden {
+  display: none !important;
+}

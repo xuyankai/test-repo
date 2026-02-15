@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Neon Arena — FPS</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <div id="game-container">
+    <canvas id="game-canvas"></canvas>
+    <div id="hud">
+      <div id="crosshair"></div>
+      <div id="top-bar">
+        <span id="health">❤ 100</span>
+        <span id="ammo">▮▮▮▮▮ 30</span>
+        <span id="score">0</span>
+      </div>
+      <div id="start-screen">
+        <h1>NEON ARENA</h1>
+        <p>WASD — Move · Mouse — Look · Click — Shoot</p>
+        <button id="start-btn">ENTER ARENA</button>
+      </div>
+      <div id="game-over" class="hidden">
+        <h2>GAME OVER</h2>
+        <p id="final-score">Score: 0</p>
+        <button id="restart-btn">PLAY AGAIN</button>
+      </div>
+    </div>
+  </div>
+  <script type="importmap">
+  {
+    "imports": {
+      "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
+      "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/"
+    }
+  }
+  </script>
+  <script type="module" src="js/game.js"></script>
+</body>
+</html>
